@@ -7,7 +7,8 @@ class QuoteApp extends StatelessWidget{
   Widget build(BuildContext context){
     return MaterialApp(
       title: "Random Quote Generator",
-      home: Quotescreen(),
+      debugShowCheckedModeBanner: false,
+      home: const Quotescreen(),
     );
   }
 
