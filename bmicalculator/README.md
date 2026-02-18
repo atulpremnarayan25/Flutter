@@ -28,7 +28,7 @@ BMI = weight (kg) / (height (m) × height (m))
 
 ## Screen Shots
 
-![ScreenShot1](images/Screenshot1.png)
-![ScreenShot2](images/Screenshot2.png)
-![ScreenShot3](images/Screenshot3.png)
-![ScreenShot4](images/Screenshot4.png)
+![Screenshot1](images/Screenshot1.png)
+![Screenshot2](images/Screenshot2.png)
+![Screenshot3](images/Screenshot3.png)
+![Screenshot4](images/Screenshot4.png)
