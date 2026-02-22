@@ -17,8 +17,9 @@ A fun, gamified Flutter mini‑game where players guess the breed of a randomly 
 * **confetti** – Displays celebration animation for correct answers
 
 ## ScreenShot
-
-![ScreenShot1](images/Screenshot1.png)
-![ScreenShot2](images/Screenshot2.png)
-![ScreenShot3](images/Screenshot3.png)
+<p align="center">
+  <img src="images/Screenshot1.png" width="250"/>
+  <img src="images/Screenshot2.png" width="250"/>
+  <img src="images/Screenshot3.png" width="250"/>
+</p>
 
