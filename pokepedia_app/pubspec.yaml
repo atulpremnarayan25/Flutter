@@ -1,0 +1,28 @@
+name: pokepedia_app
+description: A creative Pokepedia Flutter app
+
+
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  http: ^1.2.0
+  lottie: ^2.7.0
+  google_fonts: ^6.2.0
+  flutter_spinkit: ^5.2.0
+
+  cupertino_icons: ^1.0.6
+
+
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/pokeball.json
