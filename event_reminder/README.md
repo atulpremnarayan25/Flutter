@@ -21,3 +21,13 @@ Eventify is a robust, clean architecture Flutter application that allows users t
 - `services/`: Encapsulates interactions with Hive APIs and plugins.
 - `screens/`: Hosts route views like Splash, Login, Home, etc.
 - `widgets/`: Configurable and reusable component primitives.
+
+## Screenshots
+<p align="center">
+  <img src="images/Screenshot1.png" width="250"/>
+  <img src="images/Screenshot2.png" width="250"/>
+  <img src="images/Screenshot3.png" width="250"/>
+  <img src="images/Screenshot4.png" width="250"/>
+  <img src="images/Screenshot5.png" width="250"/>
+  <img src="images/Screenshot6.png" width="250"/>
+</p>
