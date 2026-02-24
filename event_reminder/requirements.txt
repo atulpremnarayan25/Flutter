@@ -1,0 +1,369 @@
+﻿App Name: Eventify – Smart Event Reminder App
+________________
+
+
+1️⃣ Project Overview
+🎯 Objective
+Build a fully functional Flutter Event Reminder App that allows users to:
+* Create events
+
+* Schedule reminders
+
+* Receive local notifications
+
+* Manage upcoming and past events
+
+* Store data locally
+
+* Maintain clean UI/UX
+
+* Follow secure coding practices
+
+The app must demonstrate:
+   * Multi-screen navigation
+
+   * Proper state management
+
+   * Local database usage
+
+   * Form validation
+
+   * Notifications
+
+   * Clean architecture
+
+________________
+
+
+2️⃣ Core Features (Must Implement)
+✅ 1. Authentication (Local Only – Secure)
+      * Simple local login system
+
+      * Email + password validation
+
+      * Store credentials securely using:
+
+         * flutter_secure_storage
+
+            * No plaintext password storage
+
+            * Logout functionality
+
+________________
+
+
+✅ 2. Screens (Minimum 4 Screens)
+1. Splash Screen
+               * App logo
+
+               * Smooth fade animation
+
+               * Auto-navigate after 2 seconds
+
+2. Login/Register Screen
+                  * Email field
+
+                  * Password field
+
+                  * Confirm password (register only)
+
+                  * Validation:
+
+                     * Valid email format
+
+                     * Password min 6 characters
+
+                        * Proper error messages
+
+3. Home Screen (Dashboard)
+                           * List of upcoming events
+
+                           * FloatingActionButton to add event
+
+                           * Bottom Navigation Bar:
+
+                              * Upcoming
+
+                              * Completed
+
+                              * Settings
+
+4. Add/Edit Event Screen
+                                 * Event Title
+
+                                 * Description
+
+                                 * Date picker
+
+                                 * Time picker
+
+                                 * Reminder toggle
+
+                                 * Save button
+
+                                 * Form validation
+
+5. Event Detail Screen
+                                    * Full event info
+
+                                    * Edit button
+
+                                    * Delete button (with confirmation dialog)
+
+________________
+
+
+3️⃣ Technical Requirements
+📦 Required Packages
+Use stable versions only:
+provider
+flutter_local_notifications
+timezone
+intl
+hive
+hive_flutter
+flutter_secure_storage
+animations
+________________
+
+
+4️⃣ State Management
+Use:
+✅ Provider (Recommended)
+Structure:
+                                       * EventProvider
+
+                                       * AuthProvider
+
+Responsibilities:
+EventProvider:
+                                          * Add event
+
+                                          * Delete event
+
+                                          * Update event
+
+                                          * Fetch events
+
+                                          * Mark completed
+
+AuthProvider:
+                                             * Login
+
+                                             * Register
+
+                                             * Logout
+
+                                             * Check authentication state
+
+________________
+
+
+5️⃣ Database Design
+📁 Use Hive (Local NoSQL DB)
+Create Event Model:
+Fields:
+id (String – UUID)
+title (String)
+description (String)
+dateTime (DateTime)
+isCompleted (bool)
+createdAt (DateTime)
+Security rules:
+                                                * No sensitive data stored in Hive
+
+                                                * Passwords must NOT be stored in Hive
+
+                                                * Only store event data
+
+________________
+
+
+6️⃣ Notification System
+Use:
+flutter_local_notifications
+timezone
+Requirements:
+                                                   * Schedule notification when event is saved
+
+                                                   * Cancel notification if event deleted
+
+                                                   * Unique notification ID per event
+
+                                                   * Handle app in foreground and background
+
+                                                   * Ask notification permission properly (Android 13+)
+
+________________
+
+
+7️⃣ UI/UX Requirements
+🎨 Design Rules
+                                                      * Modern minimal UI
+
+                                                      * Consistent color theme
+
+                                                      * Use Material 3
+
+                                                      * Rounded cards
+
+                                                      * Soft shadows
+
+                                                      * Proper padding
+
+                                                      * Responsive layout
+
+                                                      * Dark mode support
+
+Use:
+                                                         * AnimatedContainer
+
+                                                         * Hero animation (optional)
+
+                                                         * Fade transition between screens
+
+________________
+
+
+8️⃣ Folder Structure (Mandatory)
+lib/
+├── main.dart
+├── app.dart
+├── models/
+│    └── event_model.dart
+├── providers/
+│    ├── event_provider.dart
+│    └── auth_provider.dart
+├── services/
+│    ├── notification_service.dart
+│    └── auth_service.dart
+├── screens/
+│    ├── splash_screen.dart
+│    ├── login_screen.dart
+│    ├── home_screen.dart
+│    ├── add_event_screen.dart
+│    └── event_detail_screen.dart
+├── widgets/
+│    ├── event_card.dart
+│    └── custom_button.dart
+└── utils/
+     └── validators.dart
+________________
+
+
+9️⃣ Validation Rules
+📝 Form Validation
+Event Form:
+                                                            * Title cannot be empty
+
+                                                            * Date cannot be past
+
+                                                            * Time must be valid
+
+Auth Form:
+                                                               * Email regex validation
+
+                                                               * Password >= 6 characters
+
+Display errors using:
+                                                                  * TextFormField validator
+
+                                                                  * SnackBar for general errors
+
+________________
+
+
+🔟 Error Handling
+                                                                     * Try/catch around all database calls
+
+                                                                     * Try/catch around notification scheduling
+
+                                                                     * Show user-friendly error messages
+
+                                                                     * No raw exception printing in UI
+
+                                                                     * Use debugPrint instead of print
+
+________________
+
+
+1️⃣1️⃣ Security Guidelines
+⚠️ Important for vibe tool:
+                                                                        * Never hardcode secrets
+
+                                                                        * Never store passwords in Hive
+
+                                                                        * Use flutter_secure_storage for credentials
+
+                                                                        * Validate all inputs
+
+                                                                        * No eval or unsafe dynamic execution
+
+                                                                        * No unnecessary permissions in AndroidManifest
+
+                                                                        * Use latest stable Flutter SDK
+
+                                                                        * Follow null-safety strictly
+
+________________
+
+
+1️⃣2️⃣ Performance Requirements
+                                                                           * Use const constructors where possible
+
+                                                                           * Use ListView.builder
+
+                                                                           * Avoid rebuilding whole screen unnecessarily
+
+                                                                           * Proper Provider usage with Consumer
+
+________________
+
+
+1️⃣3️⃣ Bonus Features (Optional but Recommended)
+                                                                              * Search events
+
+                                                                              * Sort by date
+
+                                                                              * Swipe to delete
+
+                                                                              * Mark as completed with animation
+
+                                                                              * Empty state illustration
+
+                                                                              * Local backup export (JSON)
+
+________________
+
+
+1️⃣4️⃣ Testing Requirements
+                                                                                 * App should run without errors
+
+                                                                                 * No red screen
+
+                                                                                 * No deprecated API usage
+
+                                                                                 * Null-safety compliant
+
+                                                                                 * Works on Android 13+
+
+                                                                                 * Handles notification permission properly
+
+________________
+
+
+1️⃣5️⃣ Deliverables
+The vibe tool must generate:
+                                                                                    1. Complete Flutter project
+
+                                                                                    2. pubspec.yaml
+
+                                                                                    3. Clean code
+
+                                                                                    4. README.md (under 200 words)
+
+                                                                                    5. Proper comments
+
+                                                                                    6. No compile errors
+
+________________
