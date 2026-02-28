@@ -34,6 +34,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _showSettings() {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final email = authProvider.currentUser?.email ?? 'Unknown user';
+
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -52,10 +55,19 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               const Divider(),
               ListTile(
+                leading: const Icon(Icons.account_circle_outlined),
+                title: const Text('Signed in as'),
+                subtitle: Text(
+                  email,
+                  style: const TextStyle(fontWeight: FontWeight.w500),
+                ),
+              ),
+              const Divider(),
+              ListTile(
                 leading: const Icon(Icons.logout, color: Colors.red),
                 title: const Text('Logout', style: TextStyle(color: Colors.red)),
                 onTap: () async {
-                  await Provider.of<AuthProvider>(context, listen: false).logout();
+                  await authProvider.logout();
                   if (context.mounted) {
                     Navigator.pushReplacementNamed(context, '/login');
                   }

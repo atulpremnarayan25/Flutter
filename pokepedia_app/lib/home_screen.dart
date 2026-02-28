@@ -147,18 +147,33 @@ class _HomeScreenState extends State<HomeScreen> {
             floating: false,
             pinned: true,
             flexibleSpace: FlexibleSpaceBar(
-              titlePadding: const EdgeInsets.only(left: 16, bottom: 14),
-              title: Row(
+              titlePadding: const EdgeInsets.only(left: 16, bottom: 7),
+              title: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text('⚡', style: TextStyle(fontSize: 18)),
-                  const SizedBox(width: 6),
                   Text(
-                    'PokéDesk',
+                    'Hello, ${widget.username}! 👋',
                     style: GoogleFonts.poppins(
-                      fontWeight: FontWeight.w800,
-                      fontSize: 22,
+                      fontWeight: FontWeight.w600,
+                      fontSize: 11,
                       color: Colors.white,
                     ),
+                  ),
+                  Row(
+                    children: [
+                      const Text('⚡', style: TextStyle(fontSize: 16)),
+                      const SizedBox(width: 4),
+                      Text(
+                        'PokéDesk',
+                        style: GoogleFonts.poppins(
+                          fontWeight: FontWeight.w800,
+                          fontSize: 20,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -168,19 +183,6 @@ class _HomeScreenState extends State<HomeScreen> {
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [Color(0xFFCC0000), Color(0xFF880000)],
-                  ),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 16, bottom: 56, top: 16),
-                  child: Align(
-                    alignment: Alignment.topRight,
-                    child: Text(
-                      'Hello, ${widget.username}! 👋',
-                      style: GoogleFonts.poppins(
-                        fontSize: 13,
-                        color: Colors.white70,
-                      ),
-                    ),
                   ),
                 ),
               ),

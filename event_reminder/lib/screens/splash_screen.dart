@@ -1,6 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../providers/auth_provider.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -25,6 +24,7 @@ class _SplashScreenState extends State<SplashScreen>
 
     _controller.forward();
 
+    // Wait for the splash animation then check Firebase auth state.
     Future.delayed(const Duration(seconds: 2), () {
       _checkAuthAndNavigate();
     });
@@ -32,9 +32,8 @@ class _SplashScreenState extends State<SplashScreen>
 
   void _checkAuthAndNavigate() {
     if (!mounted) return;
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-
-    if (authProvider.isAuthenticated) {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
       Navigator.pushReplacementNamed(context, '/home');
     } else {
       Navigator.pushReplacementNamed(context, '/login');
@@ -72,7 +71,7 @@ class _SplashScreenState extends State<SplashScreen>
               ),
               const SizedBox(height: 8),
               const Text(
-                'Smart Event ReminderApp',
+                'Smart Event Reminder App',
                 style: TextStyle(fontSize: 16, color: Colors.grey),
               ),
             ],

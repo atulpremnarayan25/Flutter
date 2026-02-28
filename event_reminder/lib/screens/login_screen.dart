@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
@@ -16,9 +17,10 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-  
+
   bool _isLoginMode = true;
   bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
 
   @override
   void dispose() {
@@ -47,11 +49,44 @@ class _LoginScreenState extends State<LoginScreen> {
     if (success) {
       Navigator.pushReplacementNamed(context, '/home');
     } else {
+      final msg = authProvider.errorMessage ??
+          (_isLoginMode ? 'Login failed. Please check your credentials.' : 'Registration failed.');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(_isLoginMode
-              ? 'Login failed. Please check your credentials.'
-              : 'Registration failed.'),
+          content: Text(msg),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  void _forgotPassword() async {
+    final email = _emailController.text.trim();
+    if (email.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please enter your email address first.'),
+        ),
+      );
+      return;
+    }
+
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final success = await authProvider.sendPasswordResetEmail(email);
+
+    if (!mounted) return;
+
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Password reset email sent. Check your inbox.'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(authProvider.errorMessage ?? 'Failed to send reset email.'),
           backgroundColor: Colors.red,
         ),
       );
@@ -73,6 +108,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  // Avatar / logo
                   Icon(
                     Icons.event_note,
                     size: 80,
@@ -99,6 +135,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   const SizedBox(height: 32),
+
+                  // Email field
                   TextFormField(
                     controller: _emailController,
                     decoration: const InputDecoration(
@@ -107,9 +145,12 @@ class _LoginScreenState extends State<LoginScreen> {
                       border: OutlineInputBorder(),
                     ),
                     keyboardType: TextInputType.emailAddress,
+                    autocorrect: false,
                     validator: Validators.validateEmail,
                   ),
                   const SizedBox(height: 16),
+
+                  // Password field
                   TextFormField(
                     controller: _passwordController,
                     decoration: InputDecoration(
@@ -132,16 +173,30 @@ class _LoginScreenState extends State<LoginScreen> {
                     obscureText: _obscurePassword,
                     validator: Validators.validatePassword,
                   ),
+
+                  // Confirm password (register mode only)
                   if (!_isLoginMode) ...[
                     const SizedBox(height: 16),
                     TextFormField(
                       controller: _confirmPasswordController,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: 'Confirm Password',
-                        prefixIcon: Icon(Icons.lock_outline),
-                        border: OutlineInputBorder(),
+                        prefixIcon: const Icon(Icons.lock_outline),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscureConfirmPassword
+                                ? Icons.visibility_off
+                                : Icons.visibility,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _obscureConfirmPassword = !_obscureConfirmPassword;
+                            });
+                          },
+                        ),
+                        border: const OutlineInputBorder(),
                       ),
-                      obscureText: true,
+                      obscureText: _obscureConfirmPassword,
                       validator: (value) {
                         if (value != _passwordController.text) {
                           return 'Passwords do not match';
@@ -151,12 +206,25 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ],
                   const SizedBox(height: 24),
+
+                  // Submit button
                   CustomButton(
                     text: _isLoginMode ? 'Login' : 'Register',
                     isLoading: authProvider.isLoading,
                     onPressed: _submit,
                   ),
-                  const SizedBox(height: 16),
+
+                  // Forgot password link (login mode only)
+                  if (_isLoginMode)
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton(
+                        onPressed: _forgotPassword,
+                        child: const Text('Forgot password?'),
+                      ),
+                    ),
+
+                  // Toggle login/register
                   TextButton(
                     onPressed: () {
                       setState(() {
@@ -165,7 +233,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                     child: Text(
                       _isLoginMode
-                          ? 'Don\'t have an account? Register'
+                          ? "Don't have an account? Register"
                           : 'Already have an account? Login',
                     ),
                   ),

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "131054565517",
+    "project_id": "pokedesk-10479",
+    "storage_bucket": "pokedesk-10479.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:131054565517:android:4e527a981b0e824ae48ac4",
+        "android_client_info": {
+          "package_name": "com.example.event_reminder"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBe46sD4oNYOsT8vNlABxg3q5cI5YxmSpA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
