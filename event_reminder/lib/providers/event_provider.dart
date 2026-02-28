@@ -30,28 +30,25 @@ class EventProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> addEvent(Event event, {bool setReminder = false}) async {
+  Future<bool> addEvent(Event event, {bool setReminder = false}) async {
     try {
       final box = Hive.box<Event>(_boxName);
       await box.put(event.id, event);
       _events.add(event);
 
-      if (setReminder && event.dateTime.isAfter(DateTime.now())) {
-        await _notificationService.scheduleNotification(
-          id: event.id.hashCode,
-          title: 'Event Reminder: ${event.title}',
-          body: event.description.isNotEmpty ? event.description : 'You have an upcoming event.',
-          scheduledDate: event.dateTime,
-        );
+      if (setReminder) {
+        await _trySchedule(event);
       }
 
       notifyListeners();
+      return true;
     } catch (e) {
       debugPrint('Error adding event: $e');
+      return false;
     }
   }
 
-  Future<void> updateEvent(Event event, {bool setReminder = false}) async {
+  Future<bool> updateEvent(Event event, {bool setReminder = false}) async {
     try {
       final box = Hive.box<Event>(_boxName);
       await box.put(event.id, event);
@@ -64,31 +61,42 @@ class EventProvider extends ChangeNotifier {
       // Cancel previous notification just in case
       await _notificationService.cancelNotification(event.id.hashCode);
 
-      if (!event.isCompleted && setReminder && event.dateTime.isAfter(DateTime.now())) {
-        await _notificationService.scheduleNotification(
-          id: event.id.hashCode,
-          title: 'Event Reminder: ${event.title}',
-          body: event.description.isNotEmpty ? event.description : 'You have an upcoming event.',
-          scheduledDate: event.dateTime,
-        );
+      if (!event.isCompleted && setReminder) {
+        await _trySchedule(event);
       }
 
       notifyListeners();
+      return true;
     } catch (e) {
       debugPrint('Error updating event: $e');
+      return false;
     }
   }
 
-  Future<void> toggleEventCompletion(Event event) async {
+  Future<void> _trySchedule(Event event) async {
+    // Adding 1 minute buffer so we don't accidentally try to schedule 
+    // a notification 1 millisecond in the past, which throws an exception.
+    if (event.dateTime.isAfter(DateTime.now().subtract(const Duration(minutes: 1)))) {
+      await _notificationService.scheduleNotification(
+        id: event.id.hashCode,
+        title: 'Event Reminder: ${event.title}',
+        body: event.description.isNotEmpty ? event.description : 'You have an upcoming event.',
+        scheduledDate: event.dateTime,
+      );
+    }
+  }
+
+  Future<bool> toggleEventCompletion(Event event) async {
     final updatedEvent = event.copyWith(isCompleted: !event.isCompleted);
-    await updateEvent(updatedEvent);
+    final success = await updateEvent(updatedEvent);
     
-    if (updatedEvent.isCompleted) {
+    if (success && updatedEvent.isCompleted) {
       await _notificationService.cancelNotification(event.id.hashCode);
     }
+    return success;
   }
 
-  Future<void> deleteEvent(String id) async {
+  Future<bool> deleteEvent(String id) async {
     try {
       final box = Hive.box<Event>(_boxName);
       await box.delete(id);
@@ -97,8 +105,10 @@ class EventProvider extends ChangeNotifier {
       await _notificationService.cancelNotification(id.hashCode);
       
       notifyListeners();
+      return true;
     } catch (e) {
       debugPrint('Error deleting event: $e');
+      return false;
     }
   }
 }

@@ -52,6 +52,16 @@ class _AddEventScreenState extends State<AddEventScreen> {
       initialDate: _selectedDate ?? DateTime.now(),
       firstDate: DateTime.now(),
       lastDate: DateTime.now().add(const Duration(days: 365 * 5)),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: Theme.of(context).colorScheme.copyWith(
+              primary: Theme.of(context).colorScheme.primary,
+            ),
+          ),
+          child: child!,
+        );
+      },
     );
     if (picked != null) {
       setState(() {
@@ -76,7 +86,10 @@ class _AddEventScreenState extends State<AddEventScreen> {
     if (!_formKey.currentState!.validate()) return;
     if (_selectedDate == null || _selectedTime == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select date and time')),
+        SnackBar(
+          content: const Text('Please select date and time'),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
       );
       return;
     }
@@ -91,7 +104,10 @@ class _AddEventScreenState extends State<AddEventScreen> {
 
     if (finalDateTime.isBefore(DateTime.now())) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Event time cannot be in the past')),
+        SnackBar(
+          content: const Text('Event time cannot be in the past'),
+          backgroundColor: Theme.of(context).colorScheme.error,
+        ),
       );
       return;
     }
@@ -124,55 +140,96 @@ class _AddEventScreenState extends State<AddEventScreen> {
   @override
   Widget build(BuildContext context) {
     final isEditing = widget.event != null;
+    final theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(isEditing ? 'Edit Event' : 'Add Event'),
+        title: Text(
+          isEditing ? 'Edit Event' : 'Create New Event',
+          style: const TextStyle(fontWeight: FontWeight.w800, letterSpacing: -0.5),
+        ),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
         child: Form(
           key: _formKey,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Text(
+                'Event Details',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: theme.colorScheme.primary,
+                ),
+              ),
+              const SizedBox(height: 16),
               TextFormField(
                 controller: _titleController,
-                decoration: const InputDecoration(
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                decoration: InputDecoration(
                   labelText: 'Event Title',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.title),
+                  prefixIcon: Icon(Icons.title_rounded, color: theme.colorScheme.primary),
+                  hintText: 'E.g., Doctor Appointment',
                 ),
                 validator: (val) => Validators.validateRequired(val, 'Title'),
                 textCapitalization: TextCapitalization.sentences,
+                textInputAction: TextInputAction.next,
               ),
               const SizedBox(height: 16),
               TextFormField(
                 controller: _descriptionController,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   labelText: 'Description (Optional)',
-                  border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.description_outlined),
+                  prefixIcon: const Padding(
+                    padding: EdgeInsets.only(bottom: 48), // Align top roughly
+                    child: Icon(Icons.notes_rounded),
+                  ),
+                  hintText: 'Add any extra details here...',
+                  alignLabelWithHint: true,
                 ),
-                maxLines: 3,
+                maxLines: 4,
                 textCapitalization: TextCapitalization.sentences,
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 32),
+              Text(
+                'Date & Time',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: theme.colorScheme.primary,
+                ),
+              ),
+              const SizedBox(height: 16),
               Row(
                 children: [
                   Expanded(
                     child: InkWell(
                       onTap: _pickDate,
-                      child: InputDecorator(
-                        decoration: const InputDecoration(
-                          labelText: 'Date',
-                          border: OutlineInputBorder(),
-                          prefixIcon: Icon(Icons.calendar_month),
+                      borderRadius: BorderRadius.circular(16),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.surface,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
+                          ),
                         ),
-                        child: Text(
-                          _selectedDate == null
-                              ? 'Select Date'
-                              : DateFormat.yMMMd().format(_selectedDate!),
+                        child: Row(
+                          children: [
+                            Icon(Icons.calendar_month_rounded, color: theme.colorScheme.primary),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                _selectedDate == null
+                                    ? 'Select Date'
+                                    : DateFormat.yMMMd().format(_selectedDate!),
+                                style: TextStyle(
+                                  fontWeight: _selectedDate == null ? FontWeight.normal : FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
@@ -181,38 +238,73 @@ class _AddEventScreenState extends State<AddEventScreen> {
                   Expanded(
                     child: InkWell(
                       onTap: _pickTime,
-                      child: InputDecorator(
-                        decoration: const InputDecoration(
-                          labelText: 'Time',
-                          border: OutlineInputBorder(),
-                          prefixIcon: Icon(Icons.access_time),
+                      borderRadius: BorderRadius.circular(16),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.surface,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: theme.colorScheme.onSurface.withValues(alpha: 0.1),
+                          ),
                         ),
-                        child: Text(
-                          _selectedTime == null
-                              ? 'Select Time'
-                              : _selectedTime!.format(context),
+                        child: Row(
+                          children: [
+                            Icon(Icons.schedule_rounded, color: theme.colorScheme.primary),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                _selectedTime == null
+                                    ? 'Select Time'
+                                    : _selectedTime!.format(context),
+                                style: TextStyle(
+                                  fontWeight: _selectedTime == null ? FontWeight.normal : FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 24),
-              SwitchListTile(
-                title: const Text('Set Reminder'),
-                subtitle: const Text('Receive a local notification'),
-                value: _setReminder,
-                onChanged: (val) {
-                  setState(() {
-                    _setReminder = val;
-                  });
-                },
-              ),
               const SizedBox(height: 32),
+              Container(
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primaryContainer.withValues(alpha: 0.3),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: theme.colorScheme.primary.withValues(alpha: 0.2),
+                  ),
+                ),
+                child: SwitchListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                  title: const Text(
+                    'Set Reminder',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  subtitle: const Text('Receive a local notification'),
+                  secondary: Icon(
+                    _setReminder ? Icons.notifications_active_rounded : Icons.notifications_off_rounded,
+                    color: _setReminder ? theme.colorScheme.primary : Colors.grey,
+                  ),
+                  value: _setReminder,
+                  activeThumbColor: theme.colorScheme.primary,
+                  onChanged: (val) {
+                    setState(() {
+                      _setReminder = val;
+                    });
+                  },
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                ),
+              ),
+              const SizedBox(height: 48),
               CustomButton(
-                text: 'Save Event',
+                text: isEditing ? 'Update Event' : 'Save Event',
                 onPressed: _saveEvent,
               ),
+              const SizedBox(height: 32), // Extra padding for scrolling
             ],
           ),
         ),

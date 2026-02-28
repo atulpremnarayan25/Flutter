@@ -17,12 +17,25 @@ class EventDetailScreen extends StatelessWidget {
         .events
         .firstWhere((e) => e.id == event.id, orElse: () => event);
 
+    final theme = Theme.of(context);
+    final isPast = evt.dateTime.isBefore(DateTime.now()) && !evt.isCompleted;
+
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: const Text('Event Details'),
+        title: const Text('Event Details', style: TextStyle(fontWeight: FontWeight.w800, letterSpacing: -0.5)),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         actions: [
           IconButton(
-            icon: const Icon(Icons.edit),
+            icon: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.surface.withValues(alpha: 0.8),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.edit_rounded, size: 20),
+            ),
             onPressed: () {
               Navigator.push(
                 context,
@@ -31,79 +44,194 @@ class EventDetailScreen extends StatelessWidget {
                 ),
               );
             },
+            tooltip: 'Edit Event',
           ),
           IconButton(
-            icon: const Icon(Icons.delete),
+            icon: Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.errorContainer.withValues(alpha: 0.8),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.delete_outline_rounded, size: 20, color: theme.colorScheme.error),
+            ),
             onPressed: () {
               _confirmDelete(context, evt.id);
             },
+            tooltip: 'Delete Event',
           ),
+          const SizedBox(width: 8),
         ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                Icon(
-                  evt.isCompleted ? Icons.check_circle : Icons.event,
-                  color: evt.isCompleted ? Colors.green : Theme.of(context).primaryColor,
-                  size: 48,
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.fromLTRB(24, 120, 24, 40),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    evt.isCompleted
+                        ? Colors.green.withValues(alpha: 0.2)
+                        : (isPast ? theme.colorScheme.error.withValues(alpha: 0.2) : theme.colorScheme.primary.withValues(alpha: 0.2)),
+                    theme.colorScheme.surface,
+                  ],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Text(
-                    evt.title,
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      decoration: evt.isCompleted
-                          ? TextDecoration.lineThrough
-                          : TextDecoration.none,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: evt.isCompleted
+                          ? Colors.green.withValues(alpha: 0.2)
+                          : (isPast ? theme.colorScheme.errorContainer : theme.colorScheme.primaryContainer),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          evt.isCompleted ? Icons.check_circle_rounded : (isPast ? Icons.warning_rounded : Icons.schedule_rounded),
+                          size: 16,
+                          color: evt.isCompleted
+                              ? Colors.green
+                              : (isPast ? theme.colorScheme.error : theme.colorScheme.primary),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          evt.isCompleted ? 'Completed' : (isPast ? 'Past Due' : 'Upcoming'),
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: evt.isCompleted
+                                ? Colors.green
+                                : (isPast ? theme.colorScheme.error : theme.colorScheme.primary),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 24),
+                  Text(
+                    evt.title,
+                    style: TextStyle(
+                      fontSize: 36,
+                      fontWeight: FontWeight.w900,
+                      height: 1.2,
+                      letterSpacing: -1,
+                      color: theme.colorScheme.onSurface,
+                      decoration: evt.isCompleted ? TextDecoration.lineThrough : TextDecoration.none,
+                    ),
+                  ),
+                ],
+              ),
             ),
-            const SizedBox(height: 32),
-            _buildInfoRow(
-              context,
-              Icons.calendar_today,
-              'Date & Time',
-              DateFormat('EEEE, MMMM d, y • h:mm a').format(evt.dateTime),
-            ),
-            const SizedBox(height: 24),
-            _buildInfoRow(
-              context,
-              Icons.description,
-              'Description',
-              evt.description.isNotEmpty ? evt.description : 'No description provided.',
-            ),
-            const SizedBox(height: 24),
-            _buildInfoRow(
-              context,
-              Icons.info_outline,
-              'Status',
-              evt.isCompleted ? 'Completed' : 'Upcoming',
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.surface,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.05),
+                          blurRadius: 20,
+                          offset: const Offset(0, 10),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      children: [
+                        _buildInfoRow(
+                          context,
+                          Icons.calendar_month_rounded,
+                          'Date',
+                          DateFormat('EEEE, MMMM d, y').format(evt.dateTime),
+                        ),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 16.0),
+                          child: Divider(height: 1),
+                        ),
+                        _buildInfoRow(
+                          context,
+                          Icons.access_time_rounded,
+                          'Time',
+                          DateFormat('h:mm a').format(evt.dateTime),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 32),
+                  Text(
+                    'About Event',
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.surface,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: theme.colorScheme.onSurface.withValues(alpha: 0.05)),
+                    ),
+                    child: Text(
+                      evt.description.isNotEmpty ? evt.description : 'No description provided.',
+                      style: TextStyle(
+                        fontSize: 16,
+                        height: 1.6,
+                        color: evt.description.isNotEmpty 
+                            ? theme.colorScheme.onSurface 
+                            : theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                        fontStyle: evt.description.isNotEmpty ? FontStyle.normal : FontStyle.italic,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 48),
+                ],
+              ),
             ),
           ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          Provider.of<EventProvider>(context, listen: false).toggleEventCompletion(evt);
+        },
+        backgroundColor: evt.isCompleted ? theme.colorScheme.surface : theme.colorScheme.primary,
+        foregroundColor: evt.isCompleted ? theme.colorScheme.primary : theme.colorScheme.onPrimary,
+        icon: Icon(evt.isCompleted ? Icons.undo_rounded : Icons.check_rounded),
+        label: Text(
+          evt.isCompleted ? 'Mark Undone' : 'Mark Completed',
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
     );
   }
 
-  Widget _buildInfoRow(
-    BuildContext context,
-    IconData icon,
-    String label,
-    String value,
-  ) {
+  Widget _buildInfoRow(BuildContext context, IconData icon, String label, String value) {
+    final theme = Theme.of(context);
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, color: Colors.grey, size: 28),
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.primaryContainer.withValues(alpha: 0.5),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Icon(icon, color: theme.colorScheme.primary, size: 24),
+        ),
         const SizedBox(width: 16),
         Expanded(
           child: Column(
@@ -111,10 +239,11 @@ class EventDetailScreen extends StatelessWidget {
             children: [
               Text(
                 label,
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey,
-                  fontWeight: FontWeight.w500,
+                style: TextStyle(
+                  fontSize: 13,
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.5,
                 ),
               ),
               const SizedBox(height: 4),
@@ -122,6 +251,7 @@ class EventDetailScreen extends StatelessWidget {
                 value,
                 style: const TextStyle(
                   fontSize: 16,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ],
@@ -132,24 +262,31 @@ class EventDetailScreen extends StatelessWidget {
   }
 
   void _confirmDelete(BuildContext context, String eventId) {
+    final theme = Theme.of(context);
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Event'),
-        content: const Text('Are you sure you want to delete this event?'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text('Delete Event', style: TextStyle(fontWeight: FontWeight.bold)),
+        content: const Text('Are you sure you want to delete this event? This action cannot be undone.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text('Cancel', style: TextStyle(color: theme.colorScheme.onSurface.withValues(alpha: 0.6))),
           ),
-          TextButton(
+          ElevatedButton(
             onPressed: () {
               Provider.of<EventProvider>(context, listen: false)
                   .deleteEvent(eventId);
               Navigator.pop(context); // Close dialog
               Navigator.pop(context); // Go back from details screen
             },
-            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: theme.colorScheme.error,
+              foregroundColor: theme.colorScheme.onError,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            child: const Text('Delete'),
           ),
         ],
       ),
